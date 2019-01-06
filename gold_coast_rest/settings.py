@@ -119,6 +119,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'user.User'
 
+DJOSER = {
+    'SERIALIZERS': {
+         'user_create': 'user.serializer.UserRegistrationSerializer'
+    }
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -128,6 +134,7 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=15),
     'JWT_GET_USER_SECRET_KEY': 'user.models.jwt_get_secret_key',
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'user.views.jwt_response_payload_handler',
 }
 
 # Internationalization

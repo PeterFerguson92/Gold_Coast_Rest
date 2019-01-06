@@ -8,7 +8,7 @@ def jwt_get_secret_key(user_model):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, first_name, last_name, password=None):
         """
         Creates and saves a User with the given email and password.
         """
@@ -18,6 +18,8 @@ class UserManager(BaseUserManager):
             email=self.normalize_email(email),
         )
         user.set_password(password)
+        user.first_name = first_name
+        user.last_name = last_name
         user.save(using=self._db)
         return user
 

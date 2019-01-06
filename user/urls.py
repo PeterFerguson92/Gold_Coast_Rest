@@ -12,6 +12,7 @@ urlpatterns = [
     re_path(r'^user/login/refresh/$', jwt_views.RefreshJSONWebToken.as_view(), name='user-login-refresh'),
     re_path(r'^user/logout/all/$', views.SpaUserLogoutAllView.as_view(), name='user-logout-all'),
     # re_path(r'^user/details/$', views.UserRetrieveUpdateAPIView.as_view(), name='user-details')
+    # re_path(r'^user/details/(?P<email>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})', views.RetrieveUserByUsernameView.as_view(), name='user-detailsUsername'),
     re_path(r'^user/details/(?P<userId>\d+)', views.UserRetrieveUpdateAPIView.as_view(), name='user-details')
 
 ]
