@@ -23,7 +23,7 @@ class UserRetrieveUpdateAPIView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
-    def get(self,userId):
+    def get(self,request,userId,*args, **kwargs):
         try:
             user = User.objects.get(id=userId)
         except User.DoesNotExist:
