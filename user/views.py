@@ -38,17 +38,20 @@ class UserUpdateAPIView(views.APIView,UpdateModelMixin):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
+    def get_object(self, pk):
+        return User.objects.get(pk=pk)
+
     def patch(self, request, userId , *args, **kwargs):
         print(userId)
-        try:
-            user = User.objects.get(id=userId)
-            print(user.first_name,user.email)
-            print(request.data['detail'])
-            print(request.data['value'])
-            print(request.data['id'])
-        except User.DoesNotExist:
-            return Response("User with id: " + userId + " Not Found", status=status.HTTP_404_NOT_FOUND)
-        return Response(status=status.HTTP_200_OK)
+        print(request.data['userId'])
+        user = self.get_object(request.data['userId'])
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            print(serializer.data)
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 def jwt_response_payload_handler(token, user=None, request=None):
