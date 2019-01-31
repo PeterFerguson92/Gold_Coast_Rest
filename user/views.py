@@ -34,20 +34,21 @@ class UserRetrieveAPIView(views.APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserUpdateAPIView(views.APIView,UpdateModelMixin):
+class UserChangeInfoAPIView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
     def get_object(self, pk):
         return User.objects.get(pk=pk)
 
-    def patch(self, request, userId , *args, **kwargs):
-        print(userId)
-        print(request.data['userId'])
-        user = self.get_object(request.data['userId'])
+    def patch(self, request, *args, **kwargs):
+        if 'userId' not in request.data:
+            return Response("Missing user id", status=status.HTTP_400_BAD_REQUEST)
+
+        user_id = request.data['userId'];
+        user = self.get_object(user_id)
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
-            print(serializer.data)
             serializer.save()
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)

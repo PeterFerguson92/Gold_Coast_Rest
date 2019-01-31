@@ -16,6 +16,6 @@ urlpatterns = [
     # re_path(r'^user/details/$', views.UserRetrieveUpdateAPIView.as_view(), name='user-details')
     # re_path(r'^user/details/(?P<email>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})', views.RetrieveUserByUsernameView.as_view(), name='user-detailsUsername'),
     re_path(r'^user/details/(?P<userId>\d+)', views.UserRetrieveAPIView.as_view(), name='user-details'),
-    re_path(r'^user/update/(?P<userId>\d+)', views.UserUpdateAPIView.as_view(), name='user-update')
+    re_path(r'^user/change', views.UserChangeInfoAPIView.as_view(), name='user-update')
 
 ]
