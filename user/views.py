@@ -4,17 +4,24 @@ from rest_framework import views, permissions, status
 from rest_framework.response import Response
 from .serializer import UserSerializer
 from .models import User
-from rest_framework.mixins import UpdateModelMixin
 
 
-class SpaUserLogoutAllView(views.APIView):
+class UserLogoutAllView(views.APIView):
     """
     Use this endpoint to log out all sessions for a given user.
     """
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_object(self, pk):
+        return User.objects.get(pk=pk)
+
     def post(self, request, *args, **kwargs):
-        user = request.user
+        if 'userId' not in request.data:
+            return Response("Missing user id", status=status.HTTP_400_BAD_REQUEST)
+        user_id = request.data['userId'];
+        user = self.get_object(user_id)
+        if user is None:
+            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
         user.jwt_secret = uuid.uuid4()
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -47,6 +54,8 @@ class UserChangeInfoAPIView(views.APIView):
 
         user_id = request.data['userId'];
         user = self.get_object(user_id)
+        if user is None:
+                return Response("User not found", status=status.HTTP_404_NOT_FOUND)
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
