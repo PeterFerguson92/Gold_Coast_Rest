@@ -48,6 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_owner = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
     jwt_secret = models.UUIDField(default=uuid.uuid4)
 
     objects = UserManager()
