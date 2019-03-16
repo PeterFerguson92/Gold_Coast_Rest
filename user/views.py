@@ -35,7 +35,6 @@ class UserRetrieveAPIView(views.APIView):
         try:
             user = User.objects.get(id=userId)
         except User.DoesNotExist:
-
             return Response("User with id: " + userId + " Not Found", status=status.HTTP_404_NOT_FOUND)
         serializer = UserSerializer(instance=user)
         return Response(serializer.data, status=status.HTTP_200_OK)
