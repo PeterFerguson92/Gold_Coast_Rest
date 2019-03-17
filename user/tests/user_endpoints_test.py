@@ -25,12 +25,12 @@ class UserTests(APITestCase, URLPatternsTestCase):
         self.assertNotEqual(user_old_secret, user_new_secret)
 
     def test_details_user(self):
-            """
-            Ensure we can get details of a user.
-            """
-            user = User.objects.create_user(email='normal@user.com', first_name='normal', last_name='user',password='foo')
-            data = {'userId': user.id}
-            url = 'api/user/details/' + str(user.id)
-            self.client.force_authenticate(user=user)
-            response = self.client.get(url, data, format='json')
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+        """
+        Ensure we can get details of a user.
+        """
+        user = User.objects.create_user(email='normal@user.com', first_name='normal', last_name='user',password='foo')
+        data = {'userId': user.id}
+        url = 'api/user/details/' + str(user.id)
+        self.client.force_authenticate(user=user)
+        response = self.client.get(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
