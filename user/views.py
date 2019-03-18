@@ -19,28 +19,35 @@ class UserLogoutAllView(views.APIView):
         if 'userId' not in request.data:
             return Response("Missing user id", status=status.HTTP_400_BAD_REQUEST)
         user_id = request.data['userId'];
-        user = self.get_object(user_id)
-        if user is None:
-            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response("User with id: " + user_id + " Not Found", status=status.HTTP_404_NOT_FOUND)
         user.jwt_secret = uuid.uuid4()
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserRetrieveAPIView(views.APIView):
+    """
+    Use this endpoint to retrieve a given user.
+    """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
-    def get(self,request,userId,*args, **kwargs):
+    def get(self,request,user_id,*args, **kwargs):
         try:
-            user = User.objects.get(id=userId)
+            user = User.objects.get(id=user_id)
         except User.DoesNotExist:
-            return Response("User with id: " + userId + " Not Found", status=status.HTTP_404_NOT_FOUND)
+            return Response("User with id: " + user_id + " Not Found", status=status.HTTP_404_NOT_FOUND)
         serializer = UserSerializer(instance=user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserChangeInfoAPIView(views.APIView):
+    """
+    Use this endpoint to update a given user.
+    """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
@@ -52,9 +59,10 @@ class UserChangeInfoAPIView(views.APIView):
             return Response("Missing user id", status=status.HTTP_400_BAD_REQUEST)
 
         user_id = request.data['userId'];
-        user = self.get_object(user_id)
-        if user is None:
-                return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response("User with id: " + user_id + " Not Found", status=status.HTTP_404_NOT_FOUND)
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

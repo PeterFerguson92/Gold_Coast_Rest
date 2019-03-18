@@ -14,7 +14,7 @@ urlpatterns = [
     re_path(r'^login/refresh/$', jwt_views.RefreshJSONWebToken.as_view(), name='user-login-refresh'),
     re_path(r'^logout/all/$', views.UserLogoutAllView.as_view(), name='user-logout-all'),
 
-    re_path(r'^details/(?P<userId>\d+)', views.UserRetrieveAPIView.as_view(), name='user-details'),
+    re_path(r'^details/(?P<user_id>\d+)', views.UserRetrieveAPIView.as_view(), name='user-details'),
     re_path(r'^change', views.UserChangeInfoAPIView.as_view(), name='user-update')
 
 ]
