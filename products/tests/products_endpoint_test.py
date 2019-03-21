@@ -9,8 +9,10 @@ from products.models import Product
 class ProductsTests(APITestCase, URLPatternsTestCase):
     urlpatterns = [path(r'^api/products/', include('products.urls')),]
 
+    """
+    Product list endpoint test.
+    """
     def test_get_products_list(self):
-
         user = User.objects.create(email='olivia@ovi.it')
         Product.objects.create(title='lamp', description='description', price=55)
         Product.objects.create(title='bed', description='description', price=55)
@@ -20,8 +22,10 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
+    """
+      Product detail endpoint test.
+    """
     def test_successful_get_product_detail(self):
-
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55.00)
         url = '/%5Eapi/products/details/' + str(product.id) + '/'
@@ -34,7 +38,6 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.data['price'], '55.00')
 
     def test_failed_get_product_detail_request_when_product_does_not_exists(self):
-
         user = User.objects.create(email='olivia@ovi.it')
         Product.objects.create(title='lamp', description='description', price=55.00)
         url = '/%5Eapi/products/details/' + str(90) + '/'
@@ -43,10 +46,23 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_failed_get_product_detail_request_when_productId_is_null(self):
-
         user = User.objects.create(email='olivia@ovi.it')
         Product.objects.create(title='lamp', description='description', price=55.00)
         url = '/%5Eapi/products/details/null/'
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    """
+        Product delete endpoint test.
+    """
+    def test_get_delete_product(self):
+        user = User.objects.create(email='olivia@ovi.it')
+        product1 = Product.objects.create(title='lamp', description='description', price=55)
+        product2 = Product.objects.create(title='bed', description='description', price=55)
+        data = {'productId': product1.id}
+        url = '/%5Eapi/products/product/'
+        self.client.force_authenticate(user=user)
+        response = self.client.delete(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)

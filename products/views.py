@@ -43,3 +43,26 @@ class ProductDetailView(views.APIView):
         serializer = ProductSerializer(instance=product)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class ProductView(views.APIView):
+    """
+    Use this endpoint to handle product.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProductSerializer
+
+    def get_object(self, pk):
+        return Product.objects.get(pk=pk)
+
+    def delete(self, request, *args, **kwargs):
+        if 'productId' not in request.data:
+            response_content = create_error_response("error", "Missing product id")
+            return Response(response_content, status=status.HTTP_400_BAD_REQUEST)
+        product_id = request.data['productId']
+        product = self.get_object(product_id)
+        if product is None:
+            response_content = create_error_response("error", "Product with id:" + product_id + " Not Found")
+            return Response(response_content, status=status.HTTP_404_NOT_FOUND)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
