@@ -6,6 +6,13 @@ from .models import Product
 import json
 
 
+def get_product(product_id):
+    try:
+        product = Product.objects.get(pk=product_id)
+        return product
+    except Product.DoesNotExist:
+        return None
+
 def create_error_response(key, value):
     data = {key: value}
     return data
@@ -13,7 +20,7 @@ def create_error_response(key, value):
 
 class ProductsListView(views.APIView):
     """
-    Use this endpoint get all products.
+    Use this endpoint get all products or create new one.
     """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProductSerializer
@@ -23,43 +30,59 @@ class ProductsListView(views.APIView):
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def post(self, request, *args, **kwargs):
+        if len(request.data) is 0:
+            response_content = create_error_response("error", "New Product details Not Found")
+            return Response(response_content, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ProductSerializer(data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-class ProductDetailView(views.APIView):
+
+class ProductView(views.APIView):
     """
-    Use this endpoint get details of a single product.
+    Use this endpoints to handle product.
     """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProductSerializer
 
-    def get_object(self, pk):
-        return Product.objects.get(pk=pk)
-
     def get(self, request, product_id, *args, **kwargs):
-        try:
-            product = self.get_object(product_id)
-        except Product.DoesNotExist:
+        product = get_product(product_id)
+        if product is None:
             response_content = create_error_response("error", "Product with id:" + product_id + " Not Found")
             return Response(response_content, status=status.HTTP_404_NOT_FOUND)
         serializer = ProductSerializer(instance=product)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def put(self, request, product_id, *args, **kwargs):
+        if len(request.data) is 0:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        product = get_product(product_id)
+        serializer = ProductSerializer(product, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            serializer = ProductSerializer(instance=product)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-class ProductView(views.APIView):
-    """
-    Use this endpoint to handle product.
-    """
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ProductSerializer
+    def patch(self, request, product_id, *args, **kwargs):
+        if len(request.data) is 0:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        product = get_product(product_id)
+        if product is None:
+            response_content = create_error_response("error", "Product with id:" + product_id + " Not Found")
+            return Response(response_content, status=status.HTTP_404_NOT_FOUND)
+        serializer = ProductSerializer(product, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            serializer = ProductSerializer(instance=product)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def get_object(self, pk):
-        return Product.objects.get(pk=pk)
-
-    def delete(self, request, *args, **kwargs):
-        if 'productId' not in request.data:
-            response_content = create_error_response("error", "Missing product id")
-            return Response(response_content, status=status.HTTP_400_BAD_REQUEST)
-        product_id = request.data['productId']
-        product = self.get_object(product_id)
+    def delete(self, request, product_id, *args, **kwargs):
+        product = get_product(product_id)
         if product is None:
             response_content = create_error_response("error", "Product with id:" + product_id + " Not Found")
             return Response(response_content, status=status.HTTP_404_NOT_FOUND)

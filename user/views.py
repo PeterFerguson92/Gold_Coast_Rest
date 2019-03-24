@@ -70,7 +70,6 @@ class UserChangeInfoAPIView(views.APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
 def jwt_response_payload_handler(token, user=None, request=None):
     return {
         'token': token,
