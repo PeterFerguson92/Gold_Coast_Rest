@@ -21,3 +21,20 @@ class Product(models.Model):
         """A string representation of the product model."""
         return self.title
 
+
+class Reviews(models.Model):
+    BAD = 0
+    LOW = 1
+    NORMAL = 2
+    GOOD = 3
+    HIGH = 4
+    EXCELLENT = 5
+    RATING_CHOICES = ((BAD, 'Bad'), (LOW, 'Low'), (NORMAL, 'Normal'), (GOOD, 'Good'), (HIGH, 'High'),
+                     (EXCELLENT, 'Excellent'))
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    pub_date = models.DateTimeField('date published')
+    user = models.ForeignKey(Product, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=200)
+    rating = models.IntegerField(choices=RATING_CHOICES)
+
