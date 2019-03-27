@@ -12,5 +12,12 @@ class ProductSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('id', 'product','user', 'pub_date', 'comment', 'rating',)
+        fields = ('id', 'rating',)
+        model = models.Reviews
+
+
+class ReviewDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('id', 'product', 'user', 'pub_date', 'comment', 'rating',)
         model = models.Reviews

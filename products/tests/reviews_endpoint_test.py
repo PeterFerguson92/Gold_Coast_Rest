@@ -33,20 +33,26 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         product2 = Product.objects.create(title='bed', description='description', price=55)
         Reviews.objects.create(product=product, user=user, comment='first_comment', rating=2)
         Reviews.objects.create(product=product, user=user, comment='second_comment', rating=3)
-        Reviews.objects.create(product=product2, user=user, comment='second_comment', rating=3)
+        Reviews.objects.create(product=product2, user=user, comment='third_comment', rating=5)
         url = '/%5Eapi/products/product/' + str(product.id) + '/reviews'
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-
-        self.assertEqual(response.data[0]['product'], product.id)
-        self.assertEqual(response.data[0]['user'], user.id)
-        self.assertEqual(response.data[0]['comment'], 'first_comment')
         self.assertEqual(response.data[0]['rating'], 2)
+        self.assertEqual(response.data[1]['rating'],  3)
 
-        self.assertEqual(response.data[1]['product'], product.id)
-        self.assertEqual(response.data[1]['user'], user.id)
-        self.assertEqual(response.data[1]['comment'], 'second_comment')
-        self.assertEqual(response.data[1]['rating'],  3);
+    """
+       Review detail endpoint test.
+    """
+    def test_successful_get_review_detail(self):
+        user = User.objects.create(email='olivia@ovi.it')
+        product = Product.objects.create(title='lamp', description='description', price=55)
+        review = Reviews.objects.create(product=product, user=user, comment='first_comment', rating=2)
+        review2 = Reviews.objects.create(product=product, user=user, comment='second_comment', rating=2)
+
+        url = '/%5Eapi/products/product/' + str(product.id) + '/reviews/' + str(review.id)
+        self.client.force_authenticate(user=user)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -1,7 +1,7 @@
 # Create your views here.
 from rest_framework import views, permissions, status
 from rest_framework.response import Response
-from .serializers import ProductSerializer, ReviewSerializer
+from .serializers import *
 from .models import Product, Reviews
 
 
@@ -16,13 +16,16 @@ def get_product(product_id):
         return None
 
 
-def get_reviews(product_id):
+def get_reviews_by_product_id(product_id, review_id=None):
     if product_id is None:
         return Reviews.objects.all()
     else:
         try:
             product = Product.objects.get(pk=product_id)
-            return Reviews.objects.filter(product_id=product.id)
+            if review_id is None:
+                return Reviews.objects.filter(product_id=product.id)
+            else:
+                return Reviews.objects.filter(product_id=product.id).filter(pk=review_id)
         except Product.DoesNotExist:
             return None
 
@@ -112,7 +115,18 @@ class ProductsReviewsListView(views.APIView):
     serializer_class = ReviewSerializer
 
     def get(self, request,product_id=None, *args, **kwargs):
-        reviews = get_reviews(product_id)
+        reviews = get_reviews_by_product_id(product_id)
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class ReviewView(views.APIView):
+    """
+    Use this endpoints to handle reviews.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request,product_id, review_id, *args, **kwargs):
+        reviews = get_reviews_by_product_id(product_id, review_id)
+        serializer = ReviewDetailSerializer(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
