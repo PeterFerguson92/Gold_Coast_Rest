@@ -1,6 +1,6 @@
 from django.db import models
 from enum import Enum
-
+from user.models import User
 
 class CategoryChoice(Enum):
     LIVING_ROOM = "Living Room"
@@ -33,8 +33,11 @@ class Reviews(models.Model):
                      (EXCELLENT, 'Excellent'))
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    pub_date = models.DateTimeField('date published')
-    user = models.ForeignKey(Product, on_delete=models.CASCADE)
+    pub_date = models.DateTimeField('date inserted', auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.CharField(max_length=200)
     rating = models.IntegerField(choices=RATING_CHOICES)
 
+    def __str__(self):
+        """A string representation of the review model."""
+        return str(self.id) + ' - ' + self.product.title + ' - ' + str(self.pub_date)
