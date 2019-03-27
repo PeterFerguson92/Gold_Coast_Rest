@@ -2,7 +2,7 @@ from django.test import TestCase
 from products.models import Product
 from products.models import CategoryChoice
 from products.models import Reviews
-from user.models import User;
+from user.models import User
 # Create your tests here.
 
 

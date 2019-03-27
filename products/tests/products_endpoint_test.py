@@ -56,7 +56,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
     def test_successful_get_product_detail(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55.00)
-        url = '/%5Eapi/products/product/' + str(product.id) + '/'
+        url = '/%5Eapi/products/product/' + str(product.id)
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -68,7 +68,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
     def test_failed_get_product_detail_request_when_product_does_not_exists(self):
         user = User.objects.create(email='olivia@ovi.it')
         Product.objects.create(title='lamp', description='description', price=55.00)
-        url = '/%5Eapi/products/product/' + str(90) + '/'
+        url = '/%5Eapi/products/product/' + str(90)
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -82,7 +82,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
         data = {'title': 'bed', 'description': 'new_description', 'price': '90'}
-        url = '/%5Eapi/products/product/' + str(product1.id) + '/'
+        url = '/%5Eapi/products/product/' + str(product1.id)
         self.client.force_authenticate(user=user)
         response = self.client.put(url, data, format='json')
 
@@ -96,7 +96,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
 
         data = {'title': 'bed', 'description': 'new_description', 'price': '90'}
-        url = '/%5Eapi/products/product/' + str(2) + '/'
+        url = '/%5Eapi/products/product/' + str(2)
         self.client.force_authenticate(user=user)
         response = self.client.put(url, data, format='json')
 
@@ -113,7 +113,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
-        url = '/%5Eapi/products/product/' + str(product1.id) + '/'
+        url = '/%5Eapi/products/product/' + str(product1.id)
         self.client.force_authenticate(user=user)
         response = self.client.put(url, format='json')
 
@@ -137,7 +137,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
         data = {'description': 'new_description'}
-        url = '/%5Eapi/products/product/' + str(product1.id) + '/'
+        url = '/%5Eapi/products/product/' + str(product1.id)
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
 
@@ -151,7 +151,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
-        url = '/%5Eapi/products/product/' + str(product1.id) + '/'
+        url = '/%5Eapi/products/product/' + str(product1.id)
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, format='json')
 
@@ -167,7 +167,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
         data = {'description': 'new_description'}
-        url = '/%5Eapi/products/product/' + str(67) + '/'
+        url = '/%5Eapi/products/product/' + str(67)
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
 
@@ -188,7 +188,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         number_of_current_products = len(Product.objects.get_queryset())
         self.assertEqual(number_of_current_products, 2)
 
-        url = '/%5Eapi/products/product/' + str(product1.id) + '/'
+        url = '/%5Eapi/products/product/' + str(product1.id)
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
 
@@ -203,7 +203,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         number_of_current_products = len(Product.objects.get_queryset())
         self.assertEqual(number_of_current_products, 2)
 
-        url = '/%5Eapi/products/product/' + str(8) + '/'
+        url = '/%5Eapi/products/product/' + str(8)
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
 
