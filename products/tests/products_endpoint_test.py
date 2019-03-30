@@ -41,7 +41,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         self.assertEquals(product.description, 'new_description')
         self.assertEquals(product.price, 90)
 
-    def test_failed_create_product(self):
+    def test_failed_create_product_when_no_details_are_found(self):
         user = User.objects.create(email='olivia@ovi.it')
         url = reverse('products-list')
         self.client.force_authenticate(user=user)
@@ -103,7 +103,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         number_of_current_products = len(Product.objects.get_queryset())
         product = Product.objects.first()
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(number_of_current_products, 1)
         self.assertEquals(product.title, 'bed')
         self.assertEquals(product.description, 'new_description')

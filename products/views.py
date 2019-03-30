@@ -2,37 +2,8 @@
 from rest_framework import views, permissions, status
 from rest_framework.response import Response
 from .serializers import *
-from .models import Product, Reviews
-
-
-import json
-
-
-def get_product(product_id):
-    try:
-        product = Product.objects.get(pk=product_id)
-        return product
-    except Product.DoesNotExist:
-        return None
-
-
-def get_reviews_by_product_id(product_id, review_id=None):
-    if product_id is None:
-        return Reviews.objects.all()
-    else:
-        try:
-            product = Product.objects.get(pk=product_id)
-            if review_id is None:
-                return Reviews.objects.filter(product_id=product.id)
-            else:
-                return Reviews.objects.filter(product_id=product.id).filter(pk=review_id)
-        except Product.DoesNotExist:
-            return None
-
-
-def create_error_response(key, value):
-    data = {key: value}
-    return data
+from .models import Product
+from .utlis import *
 
 
 class ProductsListView(views.APIView):
@@ -63,61 +34,81 @@ class ProductView(views.APIView):
     Use this endpoints to handle product.
     """
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ProductSerializer
 
     def get(self, request, product_id, *args, **kwargs):
-        product = get_product(product_id)
-        if product is None:
-            response_content = create_error_response("error", "Product with id:" + product_id + " Not Found")
+        try:
+            product = get_product(product_id)
+            serializer = ProductSerializer(instance=product)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as exception:
+            response_content = create_error_response("error", exception.args[0])
             return Response(response_content, status=status.HTTP_404_NOT_FOUND)
-        serializer = ProductSerializer(instance=product)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, product_id, *args, **kwargs):
         if len(request.data) is 0:
             return Response(status=status.HTTP_204_NO_CONTENT)
-        product = get_product(product_id)
-        serializer = ProductSerializer(product, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer = ProductSerializer(instance=product)
+        try:
+            product = get_product(product_id)
+            serializer = ProductSerializer(product, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                serializer = ProductSerializer(instance=product)
+                return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            serializer = ProductSerializer(data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, product_id, *args, **kwargs):
         if len(request.data) is 0:
             return Response(status=status.HTTP_204_NO_CONTENT)
-        product = get_product(product_id)
-        if product is None:
-            response_content = create_error_response("error", "Product with id:" + product_id + " Not Found")
-            return Response(response_content, status=status.HTTP_404_NOT_FOUND)
-        serializer = ProductSerializer(product, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer = ProductSerializer(instance=product)
+        try:
+            product = get_product(product_id)
+            serializer = ProductSerializer(product, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                serializer = ProductSerializer(instance=product)
+                return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exception:
+            response_content = create_error_response("error", exception.args[0])
+            return Response(response_content, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, product_id, *args, **kwargs):
-        product = get_product(product_id)
-        if product is None:
-            response_content = create_error_response("error", "Product with id:" + product_id + " Not Found")
+        try:
+            product = get_product(product_id)
+            product.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as exception:
+            response_content = create_error_response("error", exception.args[0])
             return Response(response_content, status=status.HTTP_404_NOT_FOUND)
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProductsReviewsListView(views.APIView):
     """
-    Use this endpoint get all reviews for a specific product.
+    Use this endpoint get all reviews for a specific product or create a new one for a specific product.
     """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ReviewSerializer
 
-    def get(self, request,product_id=None, *args, **kwargs):
+    def get(self, request, product_id=None, *args, **kwargs):
         reviews = get_reviews_by_product_id(product_id)
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        if len(request.data) is 0:
+            response_content = create_error_response("error", "New review details not found")
+            return Response(response_content, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            create_review(request.data)
+            return Response(status=status.HTTP_201_CREATED)
+        except Exception as exception:
+            response_content = create_error_response("error", exception.args[0])
+            return Response(response_content, status=status.HTTP_404_NOT_FOUND)
 
 
 class ReviewView(views.APIView):

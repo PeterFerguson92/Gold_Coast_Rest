@@ -1,7 +1,7 @@
 from django.test import TestCase
 from products.models import Product
 from products.models import CategoryChoice
-from products.models import Reviews
+from products.models import Review
 from user.models import User
 # Create your tests here.
 
@@ -19,7 +19,7 @@ class ProductTest(TestCase):
         return Product.objects.create(title=title, description=description, price=price, category=category)
 
     def create_review(self, product, user, comment, rating):
-        return Reviews.objects.create(product=product, user=user, comment=comment, rating=rating)
+        return Review.objects.create(product=product, user=user, comment=comment, rating=rating)
 
     def create_user(self):
         return User.objects.create_user(email='test@user.com', first_name='test_first_name',

@@ -22,7 +22,7 @@ class Product(models.Model):
         return self.title
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     BAD = 0
     LOW = 1
     NORMAL = 2
