@@ -132,7 +132,9 @@ class ReviewView(views.APIView):
     def put(self, request, product_id, review_id, *args, **kwargs):
         if len(request.data) is 0:
             return Response(status=status.HTTP_204_NO_CONTENT)
+        product = None
         try:
+            product = get_product(product_id)
             with transaction.atomic():
                 review = get_reviews_by_product_id(product_id, review_id)
                 serializer = ReviewDetailSerializer(review, data=request.data, partial=True)
@@ -145,7 +147,7 @@ class ReviewView(views.APIView):
             request.data['product'] = request.data['product_id']
             request.data['user'] = request.data['user_id']
             serializer = ReviewDetailSerializer(data=request.data, partial=True)
-            if serializer.is_valid():
+            if serializer.is_valid() and product is not None:
                 serializer.save()
                 return Response(status=status.HTTP_201_CREATED)
             return Response(status=status.HTTP_400_BAD_REQUEST)
