@@ -3,7 +3,11 @@ from rest_framework import views, permissions, status
 from rest_framework.response import Response
 from .serializers import *
 from .models import Product
+
 from .utlis import *
+from django.forms.models import model_to_dict
+from django.db import transaction
+
 
 
 class ProductsListView(views.APIView):
@@ -117,7 +121,31 @@ class ReviewView(views.APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request,product_id, review_id, *args, **kwargs):
-        reviews = get_reviews_by_product_id(product_id, review_id)
-        serializer = ReviewDetailSerializer(reviews, many=True)
+    def get(self, request, product_id, review_id, *args, **kwargs):
+        review = get_reviews_by_product_id(product_id, review_id)
+        if len(review) is 0:
+            response_content = create_error_response("error", "Review with id: {0} not found".format(review_id))
+            return Response(response_content, status=status.HTTP_404_NOT_FOUND)
+        serializer = ReviewDetailSerializer(review, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, product_id, review_id, *args, **kwargs):
+        if len(request.data) is 0:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            with transaction.atomic():
+                review = get_reviews_by_product_id(product_id, review_id)
+                serializer = ReviewDetailSerializer(review, data=request.data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    serializer = ReviewDetailSerializer(instance=review)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            request.data['product'] = request.data['product_id']
+            request.data['user'] = request.data['user_id']
+            serializer = ReviewDetailSerializer(data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)

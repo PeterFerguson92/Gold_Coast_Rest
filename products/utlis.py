@@ -39,7 +39,8 @@ def get_reviews_by_product_id(product_id, review_id=None):
             if review_id is None:
                 return Review.objects.filter(product_id=product.id)
             else:
-                return Review.objects.filter(product_id=product.id).filter(pk=review_id)
+                review = Review.objects.filter(product_id=product.id).filter(pk=review_id).first()
+                return review
         except Product.DoesNotExist:
             return None
 
