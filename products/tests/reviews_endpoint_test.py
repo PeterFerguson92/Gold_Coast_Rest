@@ -83,7 +83,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
     def test_successful_get_review_detail(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
-        review = Review.objects.create(product=product, user=user, comment='first_comment', rating=2)
+        review = Review.objects.create(product=product, user=user, comment='first_comment', rating=4)
         review2 = Review.objects.create(product=product, user=user, comment='second_comment', rating=2)
 
         url = '/%5Eapi/products/product/' + str(product.id) + '/reviews/' + str(review.id)

@@ -123,10 +123,10 @@ class ReviewView(views.APIView):
 
     def get(self, request, product_id, review_id, *args, **kwargs):
         review = get_reviews_by_product_id(product_id, review_id)
-        if len(review) is 0:
+        if review is None:
             response_content = create_error_response("error", "Review with id: {0} not found".format(review_id))
             return Response(response_content, status=status.HTTP_404_NOT_FOUND)
-        serializer = ReviewDetailSerializer(review, many=True)
+        serializer = ReviewDetailSerializer(review)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, product_id, review_id, *args, **kwargs):
