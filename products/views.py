@@ -28,6 +28,17 @@ class ProductsListView(views.APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class ProductCategoryView(views.APIView):
+    def get(self, request, category, *args, **kwargs):
+        try:
+            products = get_product_by_category(category)
+            serializer = ProductSerializer(products, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as exception:
+            response_content = create_error_response("error", exception.args[0])
+            return Response(response_content, status=status.HTTP_404_NOT_FOUND)
+
+
 class ProductView(views.APIView):
     """
     Use this endpoints to handle product.

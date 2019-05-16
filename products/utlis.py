@@ -12,6 +12,14 @@ def get_product(product_id):
         raise Exception("Product with id: {0} not found".format(product_id))
 
 
+def get_product_by_category(category):
+    try:
+        products = Product.objects.filter(category=category)
+        return products
+    except Product.DoesNotExist:
+        raise Exception("Products of category: {0} not found".format(category))
+
+
 def get_user(user_id):
     try:
         user = User.objects.get(pk=user_id)
