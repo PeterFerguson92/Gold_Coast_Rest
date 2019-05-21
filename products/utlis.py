@@ -1,6 +1,6 @@
 from django.http import Http404
 
-from .models import Product, Review
+from .models import Product, Review, CategoryChoice
 from user.models import User
 
 
@@ -56,3 +56,7 @@ def get_reviews_by_product_id(product_id, review_id=None):
 def create_error_response(key, value):
     data = {key: value}
     return data
+
+
+def get_category_choices_values():
+    return set(item.name for item in CategoryChoice)

@@ -18,7 +18,7 @@ class UserTests(APITestCase, URLPatternsTestCase):
         return User.objects.create_user(email=self.USER_EMAIL,first_name=self.USER_FIRST_NAME,
                                         last_name=self.USER_LAST_NAME,password=self.USER_PASSWORD)
 
-    def test_successful_logout_user(self):
+    def test_should_successful_logout_user(self):
 
         user = self.create_user()
         user_old_secret = user.jwt_secret
@@ -33,7 +33,7 @@ class UserTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertNotEqual(user_old_secret, user_new_secret)
 
-    def test_failed_logout_user_when_no_userId_isFound(self):
+    def test_should_not_logout_user_when_no_userId_isFound(self):
 
         user = self.create_user()
         url = reverse('user-logout-all')
@@ -43,7 +43,7 @@ class UserTests(APITestCase, URLPatternsTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_failed_logout_user_when_userIsNotFound(self):
+    def test_should_not_logout_user_when_userIsNotFound(self):
 
         user = self.create_user()
         data = {'userId': '5'}
@@ -54,10 +54,10 @@ class UserTests(APITestCase, URLPatternsTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_successful_details_user(self):
+    def test_should_successful_get_user_details(self):
 
         user = self.create_user()
-        url = '/%5Eapi/user/details/' + str(user.id) + '/'
+        url = '/%5Eapi/user/details/{0}/'.format(str(user.id))
         self.client.force_authenticate(user=user)
 
         response = self.client.get(url, format='json')
@@ -68,7 +68,7 @@ class UserTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.data['first_name'], user.first_name)
         self.assertEqual(response.data['last_name'], user.last_name)
 
-    def test_failed_details_user_when_no_userId_isFound(self):
+    def test_should_not_get_user_details_when_no_userId_isFound(self):
         user = self.create_user()
         url = '/%5Eapi/user/details/'
         self.client.force_authenticate(user=user)
@@ -77,17 +77,17 @@ class UserTests(APITestCase, URLPatternsTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_failed_details_user_when_userIsNotFound(self):
+    def test_should_not_get_user_details_when_userIsNotFound(self):
 
         user = self.create_user()
-        url = '/%5Eapi/user/details/' + str(5) + '/'
+        url = '/%5Eapi/user/details/{0}/'.format(str(5))
         self.client.force_authenticate(user=user)
 
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_successful_update_user(self):
+    def test_should_successful_update_user(self):
 
         user = self.create_user()
         data = {'userId': user.id, 'first_name': 'new_firstname'}
@@ -100,7 +100,7 @@ class UserTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(updated_user.first_name, 'new_firstname')
 
-    def test_failed_update_user_when_no_userId_isFound(self):
+    def test_should_not_update_user_when_no_userId_isFound(self):
 
         user = self.create_user()
         data = {'first_name': 'new_first_name'}
@@ -111,7 +111,7 @@ class UserTests(APITestCase, URLPatternsTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_failed_update_user_when_userIsNotFound(self):
+    def testtest_should_not_update_user_when_userIsNotFound(self):
 
         user = self.create_user()
         data = {'userId': '5', 'first_name': 'new_first_name'}

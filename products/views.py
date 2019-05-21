@@ -30,6 +30,10 @@ class ProductsListView(views.APIView):
 
 class ProductCategoryView(views.APIView):
     def get(self, request, category, *args, **kwargs):
+        categories = get_category_choices_values()
+        if category not in categories:
+            response_content = create_error_response("error", "No product with category {0} found".format(category))
+            return Response(response_content, status=status.HTTP_400_BAD_REQUEST)
         try:
             products = get_product_by_category(category)
             serializer = ProductSerializer(products, many=True)

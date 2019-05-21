@@ -13,7 +13,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
     """
     Product reviews list endpoint test.
     """
-    def test_successful_get_products_reviews_for_all_product(self):
+    def test_should_successful_get_products_reviews_for_all_product(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
         product2 = Product.objects.create(title='bed', description='description', price=55)
@@ -27,14 +27,15 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)
 
-    def test_successful_get_products_reviews_for_specific_product(self):
+    def test_should_successful_get_products_reviews_for_specific_product(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
         product2 = Product.objects.create(title='bed', description='description', price=55)
         Review.objects.create(product=product, user=user, comment='first_comment', rating=2)
         Review.objects.create(product=product, user=user, comment='second_comment', rating=3)
         Review.objects.create(product=product2, user=user, comment='third_comment', rating=5)
-        url = '/%5Eapi/products/product/' + str(product.id) + '/reviews'
+
+        url = '/%5Eapi/products/product/{0}/reviews/'.format(str(product.id))
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
 
@@ -43,7 +44,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.data[0]['rating'], 2)
         self.assertEqual(response.data[1]['rating'],  3)
 
-    def test_successful_create_products_review_for_specific_product(self):
+    def test_should_successful_create_products_review_for_specific_product(self):
         user = User.objects.create(email='olivia@ovi.it')
         url = reverse('products-reviews-list')
         product = Product.objects.create(title='lamp', description='description', price=55)
@@ -60,7 +61,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         self.assertEquals(review.comment, 'new_comment')
         self.assertEquals(review.rating, 3)
 
-    def test_failed_create_products_reviews_for_specific_product_when_review_details_are_not_found(self):
+    def test_should_not_create_products_reviews_for_specific_product_when_review_details_are_not_found(self):
         user = User.objects.create(email='olivia@ovi.it')
         url = reverse('products-reviews-list')
         self.client.force_authenticate(user=user)
@@ -68,7 +69,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'New review details not found'})
 
-    def test_failed_create_products_reviews_for_specific_product_when_product_is_not_found(self):
+    def test_should_not_create_products_reviews_for_specific_product_when_product_is_not_found(self):
         user = User.objects.create(email='olivia@ovi.it')
         url = reverse('products-reviews-list')
         self.client.force_authenticate(user=user)
@@ -80,36 +81,39 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
     """
        Review detail endpoint test.
     """
-    def test_successful_get_review_detail(self):
+    def test_should_successful_get_review_detail(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
         review = Review.objects.create(product=product, user=user, comment='first_comment', rating=4)
         review2 = Review.objects.create(product=product, user=user, comment='second_comment', rating=2)
 
-        url = '/%5Eapi/products/product/' + str(product.id) + '/reviews/' + str(review.id)
+        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(review.id))
+
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data['id'], review.id)
 
-    def test_failed_get_review_detail_when_no_reviews_for_a_specific_product_is_found(self):
+    def test_should_return_error_when_when_no_reviews_for_a_specific_product_is_found(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
         Review.objects.create(product=product, user=user, comment='first_comment', rating=2)
 
-        url = '/%5Eapi/products/product/' + str(product.id) + '/reviews/' + str(343434)
+        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(343434))
+
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, {'error': 'Review with id: 343434 not found'})
 
-    def test_successful_patch_review(self):
+    def test_should_successful_patch_review(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
         review = Review.objects.create(product=product, user=user, comment='first_comment', rating=2)
 
         data = {'comment': 'new_comment', 'rating': 3}
-        url = '/%5Eapi/products/product/' + str(product.id) + '/reviews/' + str(review.id)
+
+        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(review.id))
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
 
@@ -117,30 +121,31 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEquals(review_updated.comment, 'new_comment')
 
-    def test_failed_patch_review_when_product_is_not_found(self):
+    def test_should_not_patch_review_when_product_is_not_found(self):
         user = User.objects.create(email='olivia@ovi.it')
-
         data = {'product_id': 63, 'user_id': user.id, 'comment': 'new_comment', 'rating': 3}
-        url = '/%5Eapi/products/product/' + str(63) + '/reviews/' + str(5)
+
+        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(56), str(455))
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEquals(response.data, {'error': 'Product or review not found'})
 
-    def test_failed_patch_review_when_review_is_not_found(self):
+    def test_should_not_patch_when_review_is_not_found(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
-
         data = {'comment': 'new_comment', 'rating': 3}
-        url = '/%5Eapi/products/product/' + str(product.id) + '/reviews/' + str(5)
+
+        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(5))
+
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEquals(response.data, {'error': 'Product or review not found'})
 
-    def test_successful_delete_review(self):
+    def test_should_successful_delete_review(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
         review = Review.objects.create(product=product, user=user, comment='first_comment', rating=4)
@@ -149,7 +154,8 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         number_of_current_reviews = len(Review.objects.get_queryset())
         self.assertEquals(number_of_current_reviews, 2)
 
-        url = '/%5Eapi/products/product/' + str(product.id) + '/reviews/' + str(review.id)
+        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(review.id))
+
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
 
@@ -157,21 +163,23 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         number_of_current_reviews = len(Review.objects.get_queryset())
         self.assertEquals(number_of_current_reviews, 1)
 
-    def test_failed_delete_review_when_product_is_not_found(self):
+    def test_should_not_delete_review_when_product_is_not_found(self):
         user = User.objects.create(email='olivia@ovi.it')
 
-        url = '/%5Eapi/products/product/' + str(3) + '/reviews/' + str(90)
+        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(3), str(90))
+
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEquals(response.data, {'error': 'Product or review not found'})
 
-    def test_failed_delete_review_when_review_is_not_found(self):
+    def test_should_not_delete_review_when_review_is_not_found(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
 
-        url = '/%5Eapi/products/product/' + str(product.id) + '/reviews/' + str(90)
+        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(90))
+
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
 
