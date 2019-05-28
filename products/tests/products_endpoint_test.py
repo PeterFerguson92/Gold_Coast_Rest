@@ -56,7 +56,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
     def test_should_get_product_detail(self):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55.00)
-        url = '/%5Eapi/products/product/{0}/'.format(str(product.id))
+        url = '/%5Eapi/products/product/{0}'.format(str(product.id))
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -82,7 +82,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
         data = {'title': 'bed', 'description': 'new_description', 'price': '90'}
-        url = '/%5Eapi/products/product/{0}/'.format(str(product1.id))
+        url = '/%5Eapi/products/product/{0}'.format(str(product1.id))
         self.client.force_authenticate(user=user)
         response = self.client.put(url, data, format='json')
 
@@ -96,7 +96,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
 
         data = {'title': 'bed', 'description': 'new_description', 'price': '90'}
-        url = '/%5Eapi/products/product/{0}/'.format(str(2))
+        url = '/%5Eapi/products/product/{0}'.format(str(2))
         self.client.force_authenticate(user=user)
         response = self.client.put(url, data, format='json')
 
@@ -113,7 +113,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
-        url = '/%5Eapi/products/product/{0}/'.format(product1.id)
+        url = '/%5Eapi/products/product/{0}'.format(product1.id)
         self.client.force_authenticate(user=user)
         response = self.client.put(url, format='json')
 
@@ -127,7 +127,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
         data = {'description': 'new_description'}
-        url = '/%5Eapi/products/product/{0}/'.format(str(product1.id))
+        url = '/%5Eapi/products/product/{0}'.format(str(product1.id))
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
 
@@ -141,7 +141,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
         product1 = Product.objects.create(title='lamp', description='description', price=55)
 
-        url = '/%5Eapi/products/product/{0}/'.format(str(product1.id))
+        url = '/%5Eapi/products/product/{0}'.format(str(product1.id))
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, format='json')
 
@@ -178,7 +178,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         number_of_current_products = len(Product.objects.get_queryset())
         self.assertEqual(number_of_current_products, 2)
 
-        url = '/%5Eapi/products/product/{0}/'.format(str(product1.id))
+        url = '/%5Eapi/products/product/{0}'.format(str(product1.id))
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
 
@@ -205,7 +205,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
         Product.objects.create(title='lamp', description='description', price=55, category="BEDROOM")
 
-        url = '/%5Eapi/products/product/category/{0}/'.format("BEDROOM")
+        url = '/%5Eapi/products/product/category/{0}'.format("BEDROOM")
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
 
@@ -219,7 +219,7 @@ class ProductsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
         Product.objects.create(title='lamp', description='description', price=55, category="roof")
 
-        url = '/%5Eapi/products/product/category/{0}/'.format("kitchen")
+        url = '/%5Eapi/products/product/category/{0}'.format("kitchen")
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
 

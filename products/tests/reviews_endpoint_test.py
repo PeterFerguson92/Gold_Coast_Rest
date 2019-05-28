@@ -87,7 +87,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         review = Review.objects.create(product=product, user=user, comment='first_comment', rating=4)
         review2 = Review.objects.create(product=product, user=user, comment='second_comment', rating=2)
 
-        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(review.id))
+        url = '/%5Eapi/products/product/{0}/reviews/{1}'.format(str(product.id), str(review.id))
 
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
@@ -99,7 +99,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         product = Product.objects.create(title='lamp', description='description', price=55)
         Review.objects.create(product=product, user=user, comment='first_comment', rating=2)
 
-        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(343434))
+        url = '/%5Eapi/products/product/{0}/reviews/{1}'.format(str(product.id), str(343434))
 
         self.client.force_authenticate(user=user)
         response = self.client.get(url, format='json')
@@ -113,7 +113,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
 
         data = {'comment': 'new_comment', 'rating': 3}
 
-        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(review.id))
+        url = '/%5Eapi/products/product/{0}/reviews/{1}'.format(str(product.id), str(review.id))
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
 
@@ -125,7 +125,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
         data = {'product_id': 63, 'user_id': user.id, 'comment': 'new_comment', 'rating': 3}
 
-        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(56), str(455))
+        url = '/%5Eapi/products/product/{0}/reviews/{1}'.format(str(56), str(455))
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
 
@@ -137,7 +137,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         product = Product.objects.create(title='lamp', description='description', price=55)
         data = {'comment': 'new_comment', 'rating': 3}
 
-        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(5))
+        url = '/%5Eapi/products/product/{0}/reviews/{1}'.format(str(product.id), str(5))
 
         self.client.force_authenticate(user=user)
         response = self.client.patch(url, data, format='json')
@@ -154,7 +154,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         number_of_current_reviews = len(Review.objects.get_queryset())
         self.assertEquals(number_of_current_reviews, 2)
 
-        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(review.id))
+        url = '/%5Eapi/products/product/{0}/reviews/{1}'.format(str(product.id), str(review.id))
 
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
@@ -166,7 +166,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
     def test_should_not_delete_review_when_product_is_not_found(self):
         user = User.objects.create(email='olivia@ovi.it')
 
-        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(3), str(90))
+        url = '/%5Eapi/products/product/{0}/reviews/{1}'.format(str(3), str(90))
 
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
@@ -178,7 +178,7 @@ class ProductsReviewsTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create(email='olivia@ovi.it')
         product = Product.objects.create(title='lamp', description='description', price=55)
 
-        url = '/%5Eapi/products/product/{0}/reviews/{1}/'.format(str(product.id), str(90))
+        url = '/%5Eapi/products/product/{0}/reviews/{1}'.format(str(product.id), str(90))
 
         self.client.force_authenticate(user=user)
         response = self.client.delete(url, format='json')
