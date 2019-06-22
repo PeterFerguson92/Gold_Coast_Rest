@@ -153,6 +153,7 @@ USE_TZ = True
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+ALLOWED_HOSTS = ['goldcoastbookings.herokuapp.com']
 
 
 STATIC_URL = '/static/'
